@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    template_source_dir: "/data/templates"
+    dest_dir: "/data/generated"
+
+  tasks:
+  - name: Copying all files from source to target directory
+    copy:
+      src: "{{ template_source_dir }}"
+      dest: "{{ dest_dir }}"
+
+  - name: Find Jinja2 template files
+    find:
+      paths: "{{ dest_dir }}"
+      file_type: file
+      recurse: yes
+      patterns: '*.j2'
+    register: templates
+
+  - name: Processing Jinga2 template files
+    template:
+      src: "{{ item.path }}"
+      dest: "{{ item.path | regex_replace('.j2') }}"
+    with_items:
+      "{{ templates.files }}"

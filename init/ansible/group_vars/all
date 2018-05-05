@@ -1,0 +1,12 @@
+---
+# Private DNS domain
+dns_domain_private: prd.lab-nxtit.priv
+
+# HTTP proxy
+http_proxy_proto: http
+http_proxy_host: "webproxy.{{ dns_domain_private}}"
+http_proxy_port: 3128
+
+http_proxy: "{{http_proxy_proto}}://{{http_proxy_host}}:{{http_proxy_port}}"
+https_proxy: "{{http_proxy_proto}}://{{http_proxy_host}}:{{http_proxy_port}}"
+no_proxy: "localhost,127.0.0.1,.localdomain,.local,.svc,.{{dns_domain_private}}"
