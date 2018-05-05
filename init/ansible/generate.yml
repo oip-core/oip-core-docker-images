@@ -7,6 +7,11 @@
     dest_dir: "/data/generated"
 
   tasks:
+  - name: Include template vars
+    include_vars:
+      file: "{{ template_source_dir }}/vars/all.yml"
+      name: tmpl_vars
+
   - name: Copying all files from source to target directory
     copy:
       src: "{{ template_source_dir }}"
