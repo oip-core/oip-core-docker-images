@@ -40,9 +40,10 @@ copy_files() {
 # Generate files from mounted source directory
 run_playbook() {
   PLAYBOOK=$1
+  shift
   cd ansible
-  _log echo "Running ansible playbook '$PLAYBOOK' from dir '$PWD'"
-  ansible-playbook -i inventory $PLAYBOOK $*
+  _log echo "Running ansible playbook '$PLAYBOOK' from dir '$PWD' with args '$@'"
+  ansible-playbook -i inventory $PLAYBOOK $@
 }
 
 
