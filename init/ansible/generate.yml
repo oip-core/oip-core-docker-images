@@ -4,30 +4,49 @@
   gather_facts: false
   vars:
     template_source_dir: "/data/templates"
-    dest_dir: "/data/generated"
+    dest_dir: "/data/generated/templates"
 
   tasks:
+  - name: Include project vars
+    include_vars:
+      file: "{{ template_source_dir }}/vars/project.yml"
+      name: project_vars
+
   - name: Include template vars
     include_vars:
       file: "{{ template_source_dir }}/vars/all.yml"
       name: tmpl_vars
 
-  - name: Copying all files from source to target directory
-    copy:
-      src: "{{ template_source_dir }}"
-      dest: "{{ dest_dir }}"
+# - name: Copying all files from source to target directory
+#   copy:
+#     src: "{{ template_source_dir }}"
+#     dest: "{{ dest_dir }}"
 
   - name: Find Jinja2 template files
     find:
-      paths: "{{ dest_dir }}"
+      paths: "{{ template_source_dir }}"
       file_type: file
       recurse: yes
       patterns: '*.j2'
     register: templates
 
+#  - name: Create destination directories
+#    debug:
+#      msg: "{{ item.path | regex_replace(template_source_dir, dest_dir) | dirname }}"
+#    with_items:
+#      "{{ templates.files }}"
+
+  - name: Create destination directories
+    file:
+      path: "{{ item.path | regex_replace(template_source_dir, dest_dir) | dirname }}"
+      state: directory
+      mode: 0775
+    with_items:
+      "{{ templates.files }}"
+
   - name: Processing Jinga2 template files
     template:
       src: "{{ item.path }}"
-      dest: "{{ item.path | regex_replace('.j2') }}"
+      dest: "{{ item.path | regex_replace(template_source_dir, dest_dir) | regex_replace('.j2') }}"
     with_items:
       "{{ templates.files }}"
